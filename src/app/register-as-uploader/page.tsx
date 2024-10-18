@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Image from "next/image";
 
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,14 @@ const FormSchema = z
       }),
 
     email: z.string().email({ message: "Invalid email address." }),
+
+    p_number: z
+      .string()
+      .regex(/^[0-9]+$/, { message: "Contact number can only contain digits." })
+      .length(10, { message: "Contact number must be exactly 10 digits." })
+      .refine((val) => val.startsWith("9"), {
+        message: "Contact number must start with 9.",
+      }),
 
     password: z
       .string()
@@ -64,6 +73,7 @@ const page = () => {
     defaultValues: {
       username: "",
       email: "",
+      p_number: "",
       password: "",
       c_password: "",
     },
@@ -81,98 +91,143 @@ const page = () => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="Your Username" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex justify-center items-center">
+        <Image
+          src="/assets/gifs/register.gif"
+          width={650}
+          height={650}
+          alt="Nepal's Flag"
         />
+      </div>
+      <div className="flex justify-center items-center">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-2/3 space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your Username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Your Working Email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your Working Email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <div className="relative">
-                <FormControl>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter Strong Password"
-                    {...field}
-                    className="pr-10"
-                  />
-                </FormControl>
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
-                </div>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="p_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <div className="flex items-center border rounded-md overflow-hidden">
+                        <div className="flex-shrink-0 p-2">
+                          <Image
+                            src="/assets/images/flag.png"
+                            width={15}
+                            height={15}
+                            alt="Nepal's Flag"
+                          />
+                        </div>
+                        <Input
+                          placeholder="Your Personal Phone Number"
+                          {...field}
+                          className="flex-1 border-none focus:ring-0 focus:outline-none"
+                        />
+                      </div>
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="c_password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <div className="relative">
-                <FormControl>
-                  <Input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Repeat Above Password"
-                    {...field}
-                    className="pr-10"
-                  />
-                </FormControl>
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={toggleConfirmPasswordVisibility}
-                >
-                  {showConfirmPassword ? <IoMdEyeOff /> : <IoMdEye />}
-                </div>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter Strong Password"
+                        {...field}
+                        className="pr-10"
+                      />
+                    </FormControl>
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex space-x-4">
-          <Button type="submit">Register</Button>
-          <Button type="button" variant="destructive" onClick={handleClear}>
-            Clear
-          </Button>
-        </div>
-      </form>
-    </Form>
+            <FormField
+              control={form.control}
+              name="c_password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Repeat Above Password"
+                        {...field}
+                        className="pr-10"
+                      />
+                    </FormControl>
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={toggleConfirmPasswordVisibility}
+                    >
+                      {showConfirmPassword ? <IoMdEyeOff /> : <IoMdEye />}
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex space-x-4">
+              <Button type="submit">Register</Button>
+              <Button type="button" variant="destructive" onClick={handleClear}>
+                Clear
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 };
 
