@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 const FormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
 
@@ -26,6 +26,7 @@ const FormSchema = z.object({
 });
 
 const page = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -38,7 +39,7 @@ const page = () => {
       password: "",
     },
   });
-
+  
   function onSubmit(data: z.infer<typeof FormSchema>) {
     let email = data.email;
     let password = data.password;
@@ -71,7 +72,7 @@ const page = () => {
       })
       .then((data) => {
         if (data === "Success") {
-          alert("Login successful");
+          router.push("/dashboard-uploader");
         } else {
           alert("Login Failed");
         }

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 const FormSchema = z
   .object({
     username: z
@@ -59,6 +59,7 @@ const FormSchema = z
   });
 
 const page = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -78,7 +79,6 @@ const page = () => {
       c_password: "",
     },
   });
-
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     let username = data.username;
     let email = data.email;
@@ -98,7 +98,7 @@ const page = () => {
   })
   .then(response => response.json())
   .then(data => {
-      alert("Success!");
+      router.push("/login-as-uploader");
   })
   .catch((error) => {
     alert("Fail!");
