@@ -2,6 +2,7 @@
 
 import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,11 +12,64 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { ImUpload } from "react-icons/im";
 import { TbMapSearch } from "react-icons/tb";
 
 const Navbar = () => {
+  const router = useRouter();
+  const [isLoginRegister, setIsLoginRegister] = useState(false);
+  const [username, setUsername] = useState("");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoginRegister(true);
+      const decodedToken = decodeToken(token);
+      if (decodedToken) {
+        setUsername(decodedToken.username);
+      }
+    } else {
+      return;
+    }
+  }, []);
+
+  const decodeToken = (token: string) => {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return null;
+    }
+  };
+
+  const handleLogOut = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/logout-as-uploader", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("token");
+        router.push("/login-as-uploader");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("An error occurred during logout:", error);
+    }
+    setIsLoginRegister(false);
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
@@ -83,72 +137,86 @@ const Navbar = () => {
                 </a>
               </li>
             </ul>
-            <div className="flex space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Login</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-46">
-                  <DropdownMenuGroup>
-                    <Link
-                      href="/login-as-uploader"
-                      className="no-underline text-black"
-                    >
-                      <DropdownMenuItem>
-                        <ImUpload className="mr-2 h-4 w-4" />
-                        <span className="cursor-pointer">
-                          Login as Uploader
-                        </span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link
-                      href="/login-as-seeker"
-                      className="no-underline text-black"
-                    >
-                      <DropdownMenuItem>
-                        <TbMapSearch className="mr-2 h-4 w-4" />
 
-                        <span className="cursor-pointer">Login as Seeker</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {!isLoginRegister ? (
+              <div className="flex space-x-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">Login</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-46">
+                    <DropdownMenuGroup>
+                      <Link
+                        href="/login-as-uploader"
+                        className="no-underline text-black"
+                      >
+                        <DropdownMenuItem>
+                          <ImUpload className="mr-2 h-4 w-4" />
+                          <span className="cursor-pointer">
+                            Login as Uploader
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link
+                        href="/login-as-seeker"
+                        className="no-underline text-black"
+                      >
+                        <DropdownMenuItem>
+                          <TbMapSearch className="mr-2 h-4 w-4" />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Register</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-46">
-                  <DropdownMenuGroup>
-                    <Link
-                      href="/register-as-uploader"
-                      className="no-underline text-black"
-                    >
-                      <DropdownMenuItem>
-                        <ImUpload className="mr-2 h-4 w-4" />
+                          <span className="cursor-pointer">
+                            Login as Seeker
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-                        <span className="cursor-pointer">
-                          Register as Uploader
-                        </span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link
-                      href="/register-as-seeker"
-                      className="no-underline text-black"
-                    >
-                      <DropdownMenuItem>
-                        <TbMapSearch className="mr-2 h-4 w-4" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">Register</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-46">
+                    <DropdownMenuGroup>
+                      <Link
+                        href="/register-as-uploader"
+                        className="no-underline text-black"
+                      >
+                        <DropdownMenuItem>
+                          <ImUpload className="mr-2 h-4 w-4" />
 
-                        <span className="cursor-pointer">
-                          Register as Seeker
-                        </span>
-                      </DropdownMenuItem>
-                    </Link>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                          <span className="cursor-pointer">
+                            Register as Uploader
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link
+                        href="/register-as-seeker"
+                        className="no-underline text-black"
+                      >
+                        <DropdownMenuItem>
+                          <TbMapSearch className="mr-2 h-4 w-4" />
+
+                          <span className="cursor-pointer">
+                            Register as Seeker
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="flex space-x-4 items-center">
+                <Link href="/dashboard-uploader" className="text-white no-underline">
+                  {username || "Loading..."}
+                </Link>
+                <Button variant="outline" onClick={handleLogOut}>
+                Logout
+              </Button>
+              </div>
+            )}
           </div>
         </div>
       </nav>

@@ -34,6 +34,7 @@ const page = () => {
     // Check if token exists in localStorage
     const token = localStorage.getItem("token");
     if (token) {
+      localStorage.setItem("firstRender", "true");
       // Redirect to dashboard if token exists
       router.push("/dashboard-uploader");
     }
@@ -84,6 +85,7 @@ const page = () => {
         if (data.token) {
           // Save the token in localStorage
           localStorage.setItem("token", data.token);
+          localStorage.setItem("firstRender", "true");
           router.push("/dashboard-uploader");
         } else {
           alert("Login Failed");
