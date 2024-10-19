@@ -118,6 +118,7 @@ const page = () => {
           width={650}
           height={650}
           alt="Nepal's Flag"
+          unoptimized
         />
       </div>
       <div className="flex justify-center items-center">
@@ -169,6 +170,7 @@ const page = () => {
                             width={15}
                             height={15}
                             alt="Nepal's Flag"
+                            unoptimized
                           />
                         </div>
                         <Input

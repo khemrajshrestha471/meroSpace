@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const FormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -28,6 +28,16 @@ const FormSchema = z.object({
 const page = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+
+
+  useEffect(() => {
+    // Check if token exists in localStorage
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Redirect to dashboard if token exists
+      router.push("/dashboard-uploader");
+    }
+  }, [router]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState: any) => !prevState);
@@ -71,7 +81,9 @@ const page = () => {
         }
       })
       .then((data) => {
-        if (data === "Success") {
+        if (data.token) {
+          // Save the token in localStorage
+          localStorage.setItem("token", data.token);
           router.push("/dashboard-uploader");
         } else {
           alert("Login Failed");
@@ -96,6 +108,7 @@ const page = () => {
           width={650}
           height={650}
           alt="Nepal's Flag"
+          unoptimized
         />
       </div>
       <div className="flex justify-center items-center">
