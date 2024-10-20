@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 
 import { ImUpload } from "react-icons/im";
 import { TbMapSearch } from "react-icons/tb";
+import { decodeToken } from "@/components/utils/decodeToken.js";
 
 const Navbar = () => {
   const router = useRouter();
@@ -33,23 +34,6 @@ const Navbar = () => {
       return;
     }
   }, []);
-
-  const decodeToken = (token: string) => {
-    try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
-    } catch (error) {
-      console.error("Invalid token:", error);
-      return null;
-    }
-  };
 
   const handleLogOut = async () => {
     try {
