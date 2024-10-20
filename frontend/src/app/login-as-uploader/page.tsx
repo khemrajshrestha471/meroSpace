@@ -38,7 +38,7 @@ const page = () => {
       localStorage.setItem("firstRender", "true");
       // Redirect to dashboard if token exists
       const decodedToken = decodeToken(token);
-      router.push(`/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`);
+      router.push(`/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`);
     }
   }, [router]);
 
@@ -89,7 +89,7 @@ const page = () => {
           localStorage.setItem("token", data.token);
           localStorage.setItem("firstRender", "true");
           const decodedToken = decodeToken(data.token);
-          router.push(`/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`);
+          router.push(`/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`);
         } else {
           alert("Login Failed");
         }

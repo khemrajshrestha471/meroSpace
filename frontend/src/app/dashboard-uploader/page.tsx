@@ -37,7 +37,7 @@ const page = () => {
           // Check if the query parameters already exist in the URL
           if (!queryParams.has("username") || !queryParams.has("Id")) {
             router.push(
-              `/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`
+              `/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`
             );
           }
         }

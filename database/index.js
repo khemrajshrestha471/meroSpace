@@ -52,7 +52,7 @@ app.post("/login-as-uploader", async (req, res) => {
             if (passwordMatch) {
                 // Generate JWT token
                 const token = jwt.sign(
-                    { userId: user._id, username: user.username },
+                    { userId: user._id, username: user.username, role: "uploader" },
                     JWT_SECRET,
                     { expiresIn: '1d' }
                 );
