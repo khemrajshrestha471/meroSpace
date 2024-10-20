@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
+import { decodeToken } from "@/components/utils/decodeToken.js";
 
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,8 @@ const page = () => {
     if (token) {
       localStorage.setItem("firstRender", "true");
       // Redirect to dashboard if token exists
-      router.push("/dashboard-uploader");
+      const decodedToken = decodeToken(token);
+      router.push(`/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`);
     }
   }, [router]);
 
@@ -86,7 +88,8 @@ const page = () => {
           // Save the token in localStorage
           localStorage.setItem("token", data.token);
           localStorage.setItem("firstRender", "true");
-          router.push("/dashboard-uploader");
+          const decodedToken = decodeToken(data.token);
+          router.push(`/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`);
         } else {
           alert("Login Failed");
         }

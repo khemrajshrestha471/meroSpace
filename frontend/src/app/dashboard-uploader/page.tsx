@@ -28,7 +28,18 @@ const page = () => {
       try {
         const decodedToken = decodeToken(token);
         if (decodedToken && decodedToken.exp) {
-          setExpiryTime(decodedToken.exp); // Set expiry time from the token
+          setExpiryTime(decodedToken.exp);
+        }
+        if (decodedToken && decodedToken.username && decodedToken.userId) {
+          // Redirect to the URL format with query params if not already there
+          const queryParams = new URLSearchParams(window.location.search);
+
+          // Check if the query parameters already exist in the URL
+          if (!queryParams.has("username") || !queryParams.has("Id")) {
+            router.push(
+              `/dashboard-uploader?username=${decodedToken.username}&Id=${decodedToken.userId}`
+            );
+          }
         }
       } catch (error) {
         console.error("Error decoding token:", error);
