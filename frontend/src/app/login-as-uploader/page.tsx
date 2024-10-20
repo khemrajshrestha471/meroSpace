@@ -45,6 +45,7 @@ const page = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prevState: any) => !prevState);
   };
+  
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

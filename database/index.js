@@ -4,7 +4,7 @@ const cors = require('cors')
 const bcrypt = require('bcrypt')
 const dotenv = require('dotenv')
 const UserModel = require('./model/User.js')
-// const cookieParser = require('cookie-parser');
+const UploaderModel = require('./model/Uploader.js')
 const jwt = require('jsonwebtoken');
 
 dotenv.config();
@@ -85,3 +85,22 @@ app.post("/logout-as-uploader", (req, res) => {
     });
     res.json({ message: "Logged out successfully" });
 });
+
+
+
+
+
+app.post("/uploader-data", async (req, res) => {
+    try {
+        const { id, unique_id, headline, description, price } = req.body;
+        const existingUniqueId = await UploaderModel.findOne({ unique_id });
+        if (existingUniqueId) {
+            return res.status(400).json({ error: "Unique ID Should not be same." });
+        }
+        const newUploaderData = new UploaderModel({ id, unique_id, headline, description, price });
+        const savedUploader = await newUploaderData.save();
+        res.status(201).json(savedUploader);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})

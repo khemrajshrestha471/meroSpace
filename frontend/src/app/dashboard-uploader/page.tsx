@@ -4,8 +4,25 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { decodeToken } from "@/components/utils/decodeToken.js";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Textarea } from "@/components/ui/textarea";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
 const page = () => {
   const [expiryTime, setExpiryTime] = useState(0);
+  const [isUserId, setIsUserId] = useState("");
   useEffect(() => {
     const isFirstRender = localStorage.getItem("firstRender");
     if (isFirstRender) {
@@ -33,14 +50,14 @@ const page = () => {
         if (decodedToken && decodedToken.username && decodedToken.userId) {
           // Redirect to the URL format with query params if not already there
           const queryParams = new URLSearchParams(window.location.search);
-
+          const u_id = queryParams.get("Id") || "";
+          setIsUserId(u_id);
           // Check if the query parameters already exist in the URL
           if (!queryParams.has("username") || !queryParams.has("Id")) {
             router.push(
               `/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`
             );
           }
-          
         }
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -63,9 +80,145 @@ const page = () => {
     }
   }, [expiryTime, router]);
 
+  const FormSchema = z.object({
+    headline: z.string(),
+    description: z.string(),
+    price: z.string(),
+  });
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      headline: "",
+      description: "",
+      price: "",
+    },
+  });
+
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    let id = isUserId;
+    // generate unique id for each individual items that have been uploaded
+    let unique_id = Array(24)
+      .fill(0)
+      .map(() => Math.random().toString(36).charAt(2))
+      .join("");
+    let headline = data.headline;
+    let description = data.description;
+    let price = data.price;
+
+    fetch("http://localhost:4000/uploader-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        id,
+        unique_id,
+        headline,
+        description,
+        price,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
+          throw new Error("Something Went Wrong.");
+        } else {
+          throw new Error("An unexpected error occurred. Please try again.");
+        }
+      })
+      .then((data) => {
+        if (data.token) {
+          // Save the token in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("firstRender", "true");
+          const decodedToken = decodeToken(data.token);
+          router.push(
+            `/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`
+          );
+        }
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+    form.reset();
+  }
+
+  const handleClear = () => {
+    form.reset();
+  };
+
   return (
     <>
-      <h1>Hello there, Welcome to personal uploader page</h1>
+      <div className="flex justify-center items-center">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-2/3 space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="headline"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Headline</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter Headline Here" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter Description Here"
+                      {...field}
+                      className="resize-none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter Price Here"
+                        {...field}
+                        className="pr-10"
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <div className="flex space-x-4">
+              <Button type="submit">Upload</Button>
+              <Button type="button" variant="destructive" onClick={handleClear}>
+                Clear
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </>
   );
 };
