@@ -18,15 +18,23 @@ import { ImUpload } from "react-icons/im";
 import { TbMapSearch } from "react-icons/tb";
 import { decodeToken } from "@/components/utils/decodeToken.js";
 
+interface DecodedToken {
+  username: string;
+  role: string;
+  userId: string;
+}
+
 const Navbar = () => {
   const router = useRouter();
   const [isLoginRegister, setIsLoginRegister] = useState(false);
   const [username, setUsername] = useState("");
+  const [isdecodedToken, setIsDecodedToken] = useState<DecodedToken | null>(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoginRegister(true);
       const decodedToken = decodeToken(token);
+      setIsDecodedToken(decodedToken)
       if (decodedToken) {
         setUsername(decodedToken.username);
       }
@@ -193,12 +201,16 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex space-x-4 items-center">
-                <Link href="/dashboard-uploader" className="text-white no-underline">
+                <Link
+                  href={`/dashboard-uploader?username=${isdecodedToken?.username}&role=${isdecodedToken?.role}&Id=${isdecodedToken?.userId}`}
+                  className="text-white no-underline"
+                >
                   {username || "Loading..."}
                 </Link>
+
                 <Button variant="outline" onClick={handleLogOut}>
-                Logout
-              </Button>
+                  Logout
+                </Button>
               </div>
             )}
           </div>

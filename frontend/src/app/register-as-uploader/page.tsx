@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
+import { decodeToken } from "@/components/utils/decodeToken.js";
 
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const FormSchema = z
   .object({
@@ -62,6 +63,16 @@ const page = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(token) {
+      const decodedToken = decodeToken(token);
+      router.push(
+        `/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`
+      );
+    }
+  }, [router])
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState: any) => !prevState);

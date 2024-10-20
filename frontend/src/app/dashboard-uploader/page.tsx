@@ -40,6 +40,7 @@ const page = () => {
               `/dashboard-uploader?username=${decodedToken.username}&role=${decodedToken.role}&Id=${decodedToken.userId}`
             );
           }
+          
         }
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -49,23 +50,22 @@ const page = () => {
     }
   }, [router]);
 
-    // Check if the token has expired
-    useEffect(() => {
-      if (expiryTime > 0) {
-        const currentTime = Date.now() / 1000;
-  
-        if (expiryTime < currentTime) {
-          // If token is expired, redirect to login
-          localStorage.removeItem("token");
-          router.push('/login-as-uploader');
-        }
-      }
-    }, [expiryTime, router]);
+  // Check if the token has expired
+  useEffect(() => {
+    if (expiryTime > 0) {
+      const currentTime = Date.now() / 1000;
 
+      if (expiryTime < currentTime) {
+        // If token is expired, redirect to login
+        localStorage.removeItem("token");
+        router.push("/login-as-uploader");
+      }
+    }
+  }, [expiryTime, router]);
 
   return (
     <>
-    <h1>Hello there, Welcome to personal uploader page</h1>
+      <h1>Hello there, Welcome to personal uploader page</h1>
     </>
   );
 };
