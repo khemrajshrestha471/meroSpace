@@ -34,6 +34,16 @@ export default function Home() {
   const itemsPerPage = 4;
 
   useEffect(() => {
+    const isFirstRenderLanding = localStorage.getItem("firstRenderLanding");
+  
+    if (!isFirstRenderLanding) {
+      localStorage.setItem("firstRenderLanding", "true");
+      window.location.reload();
+    }
+  }, []);
+  
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:4000/get-all-data");
