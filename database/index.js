@@ -86,10 +86,6 @@ app.post("/logout-as-uploader", (req, res) => {
     res.json({ message: "Logged out successfully" });
 });
 
-
-
-
-
 app.post("/uploader-data", async (req, res) => {
     try {
         const { id, unique_id, headline, description, price } = req.body;
@@ -104,3 +100,25 @@ app.post("/uploader-data", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 })
+
+app.get("/get-all-data", async (req, res) => {
+    try {
+        const uploadedAllData = await UploaderModel.find(); // Fetch all stored data
+        res.status(200).json(uploadedAllData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
+app.get("/get-all-data/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const uploadedAllData = await UploaderModel.find({ id });
+        if (!uploadedAllData) {
+            return res.status(404).json({ error: "Data not found" });
+        }
+        res.status(200).json(uploadedAllData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
