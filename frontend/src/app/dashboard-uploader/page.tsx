@@ -126,9 +126,9 @@ const page = () => {
   }, [expiryTime, router]);
 
   const FormSchema = z.object({
-    headline: z.string(),
-    description: z.string(),
-    price: z.string(),
+    headline: z.string().min(1, "Headline is required"),
+    description: z.string().min(1, "Description is required"),
+    price: z.string().min(1, "Price is required"),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -258,6 +258,7 @@ const page = () => {
                         className="pr-10"
                       />
                     </FormControl>
+                    <FormMessage />
                   </div>
                 </FormItem>
               )}
